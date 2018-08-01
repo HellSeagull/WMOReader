@@ -41,6 +41,8 @@ namespace lectureTXIDAttempt
 
                 Console.WriteLine("Offset TXID : " + firstChunkPos);
 
+                List<UInt32> TextureFiledataID = new List<UInt32>();
+
                 using (var fs = new FileStream(fileName, FileMode.Open, FileAccess.ReadWrite))
                 using (var br = new BinaryReader(fs))
                 {
@@ -51,19 +53,24 @@ namespace lectureTXIDAttempt
 
                     long EndPose = firstChunkPos + 8 + TXIDSize*4;
 
-                    long positionStream = br.BaseStream.Position;
+                    long positionStream = br.BaseStream.Position; 
 
                     do
                     {
                         if (br.BaseStream.Position <= EndPose - 4)
                         {
                             UInt32 texture = br.ReadUInt32();
-                            br.BaseStream.Seek(br.BaseStream.Position + 4, SeekOrigin.Current);
+                            br.BaseStream.Position = positionStream + 4;
                             positionStream = br.BaseStream.Position;
-                            Console.WriteLine("TXID textureFiledataID : " + texture);
+                            TextureFiledataID.Add(texture);
                         }
 
-                    } while (positionStream != EndPose - 4);
+                    } while (positionStream <= EndPose - 4);
+                }
+
+                for(UInt16 i = 0; i < TextureFiledataID.Count; i++)
+                {
+                    Console.WriteLine("TextureFileDataID " + i + " : " + TextureFiledataID.ElementAt(i));
                 }
 
                     Console.ReadLine();
