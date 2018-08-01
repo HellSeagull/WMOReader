@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{39117931-D97F-42E3-982A-0DB5FD8A6833}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>lectureTXIDAttempt</RootNamespace>
-    <AssemblyName>lectureTXIDAttempt</AssemblyName>
+    <RootNamespace>WMOReader</RootNamespace>
+    <AssemblyName>WMOReader</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -43,7 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="Reader.cs" />
+    <Compile Include="RootParser.cs" />
+    <Compile Include="Start.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
