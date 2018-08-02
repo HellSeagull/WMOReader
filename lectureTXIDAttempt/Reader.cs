@@ -20,7 +20,6 @@ namespace WMOReader
 
         private Dictionary<string, long> Offsets = new Dictionary<string, long>();
 
-
         public void lectureWMO(string path, byte[] buffer)
         {
 
@@ -48,8 +47,65 @@ namespace WMOReader
                 Console.WriteLine("CHUNK : " + entry.Key + " at Offset " + entry.Value);
             }
 
+            ReadDHOM(path);
             Console.WriteLine();
             Console.WriteLine();
+            ReadDIFG(path);
+
+            Console.WriteLine();
+            Console.WriteLine();
+
+        }
+
+        protected void ReadDHOM(string path)
+        {
+
+            Console.WriteLine();
+            Console.WriteLine("Lecture DHOM");
+
+            foreach (KeyValuePair<string, long> entry in Offsets)
+            {
+                if (entry.Key.Equals("DHOM"))
+                {
+
+                    using (var fs = new FileStream(path, FileMode.Open, FileAccess.ReadWrite))
+                    using (var br = new BinaryReader(fs))
+                    {
+
+                        br.BaseStream.Seek(entry.Value + 4, SeekOrigin.Current);
+                        UInt32 CHUNKSize = br.ReadUInt32() / 4;
+                        Console.Write("Nombre de groupe d'éléments : " + CHUNKSize);
+                        Console.WriteLine();
+
+                        long positionStream = br.BaseStream.Position;
+
+                        Console.WriteLine("Nb Texture : " + br.ReadUInt32());
+                        Console.WriteLine("Nb Groupe : " + br.ReadUInt32());
+                        Console.WriteLine("Nb Portals : " + br.ReadUInt32());
+                        Console.WriteLine("Nb Light : " + br.ReadUInt32());
+                        Console.WriteLine("Nb Models : " + br.ReadUInt32());
+                        Console.WriteLine("Nb Doodads : " + br.ReadUInt32());
+                        Console.WriteLine("Nb Sets : " + br.ReadUInt32());
+                        Console.WriteLine("Ambient Color : ");
+                        Console.Write("Rouge : " + br.ReadByte() + ", ");
+                        Console.Write("Vert : " + br.ReadByte() + ", ");
+                        Console.Write("Bleu : " + br.ReadByte() + ", ");
+                        Console.Write("Opacité : " + br.ReadByte());
+                        Console.WriteLine();
+                        Console.WriteLine("WMO ID (WMO Area Table) : " + br.ReadUInt32());
+
+                    }
+
+                }
+
+            }
+        }
+
+        protected void ReadDIFG(string path)
+        {
+
+            Console.WriteLine();
+            Console.WriteLine("Lecture DIFG");
 
             foreach (KeyValuePair<string, long> entry in Offsets)
             {
@@ -67,19 +123,15 @@ namespace WMOReader
 
                         long EndPose = entry.Value + 8 + CHUNKSize * 4;
 
-                        long positionStream = br.BaseStream.Position;
-
                         do
                         {
                             if (br.BaseStream.Position <= EndPose - 4)
                             {
                                 UInt32 LOD = br.ReadUInt32();
-                                br.BaseStream.Position = positionStream + 4;
-                                positionStream = br.BaseStream.Position;
                                 LODFileDataID.Add(LOD);
                             }
 
-                        } while (positionStream <= EndPose - 4);
+                        } while (br.BaseStream.Position <= EndPose - 4);
                     }
 
                     for (UInt16 i = 0; i < LODFileDataID.Count; i++)
@@ -98,26 +150,26 @@ namespace WMOReader
                     {
                         while ((line = file.ReadLine()) != null)
                         {
-                            foreach(var lod in LODFileDataID)
+                            foreach (var lod in LODFileDataID)
                             {
                                 if (line.Contains(lod.ToString()))
                                 {
                                     found.Add(line);
                                 }
-                            }     
+                            }
                         }
                     }
 
                     List<string> LodFilesLinked = new List<string>();
 
-                    foreach(var lodFile in found)
+                    foreach (var lodFile in found)
                     {
                         lodFile.Split(',').ToArray().ElementAt(0);
                         string file = lodFile;
                         LodFilesLinked.Add(file);
                     }
 
-                    for(UInt16 i = 0; i < LodFilesLinked.Count; i++)
+                    for (UInt16 i = 0; i < LodFilesLinked.Count; i++)
                     {
                         Console.WriteLine("Fichier Lod lié " + i + " : " + LodFilesLinked.ElementAt(i));
                     }
@@ -125,7 +177,6 @@ namespace WMOReader
                 }
 
             }
-
         }
 
         //public void lecture(string fileName, byte[] buffer)
